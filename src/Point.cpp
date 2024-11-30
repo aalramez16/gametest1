@@ -1,3 +1,3 @@
 #include "Point.h"
 
-int IPoint::lastId = 0;
+int PointInterface::lastId = 0;

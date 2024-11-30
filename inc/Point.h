@@ -9,25 +9,25 @@
 // If you want to do inheritance, this is the way I'd recommend doing it:
 
 // forward declare
-class IPoint;
+class PointInterface;
 
 template<typename T>
-concept Point = requires(T t) { std::is_base_of_v<IPoint, T>; };
+concept Point = requires(T t) { std::is_base_of_v<PointInterface, T>; };
 
 // We want to define a contract that a Point instance should follow
 // without associating the interface with a specific type of point.
 // i.e. -> decouple
-class IPoint : public std::enable_shared_from_this<IPoint> {
+class PointInterface : public std::enable_shared_from_this<PointInterface> {
 public:
-    IPoint() : id(lastId++) {}
-    explicit IPoint(const Shared<IPoint>& parent) : id(lastId++), parent(parent) {}
-    virtual ~IPoint() {
+    PointInterface() : id(lastId++) {}
+    explicit PointInterface(const Shared<PointInterface>& parent) : id(lastId++), parent(parent) {}
+    virtual ~PointInterface() {
         children.clear();
     }
 
     // You don't need this, "shared_from_this" is already accessible as a member function if you
     // inherit from enable_shared_from_this publicly
-    // Shared<IPoint> sharedFromThis() {
+    // Shared<PointInterface> sharedFromThis() {
     //     return shared_from_this();
     // }
 
@@ -36,12 +36,12 @@ public:
         return id;
     }
 
-    void setParent(const Shared<IPoint>& parent) {
+    void setParent(const Shared<PointInterface>& parent) {
         this->parent = parent;
     }
 
     // Same thing, don't allow throwing away the return value
-    [[nodiscard]] Shared<IPoint> getParent() const {
+    [[nodiscard]] Shared<PointInterface> getParent() const {
         return parent;
     }
 
@@ -49,7 +49,7 @@ public:
      * Adds a child point to the point.
      * @param child a std::unique_ptr pointer to the child node
      */
-    void addChild(const Shared<IPoint>& child) {
+    void addChild(const Shared<PointInterface>& child) {
         children.push_back(child);
     }
 
@@ -58,7 +58,7 @@ public:
      * Deletes the child and all of its children.
      * @param child a std::unique_ptr pointer to the child node
      */
-    void removeChild(const Shared<IPoint>& child) {
+    void removeChild(const Shared<PointInterface>& child) {
         // You can simplify this a lot if you just use the STL erase function.
         // It'll automatically compare the pointer addresses
         std::erase(children, child);
@@ -67,7 +67,7 @@ public:
     /**
      * Returns a vector of std::unique_ptr pointers to all children of this point.
      */
-    [[nodiscard]] const std::vector<Shared<IPoint>>& getChildren() {  // don't need second const
+    [[nodiscard]] const std::vector<Shared<PointInterface>>& getChildren() {  // don't need second const
         // const is fine here unless you need to modify this vector, then you'd just return a
         // reference
         return children;
@@ -103,7 +103,7 @@ public:
     // These are just some different ideas for modifying this point instance
 
     // ex:
-    // auto point = std::make_unique<IPoint>();
+    // auto point = std::make_unique<PointInterface>();
     // auto child = point->addChild<DuplicatePoint>(10);
     template<Point T, typename... Args>
     Shared<T> addChild(Args&&... args) {
@@ -112,7 +112,7 @@ public:
         return child;
     }
 
-    // Provide an easy method of converting to a subclass of IPoint
+    // Provide an easy method of converting to a subclass of PointInterface
     // Sorry not sorry for pascal case 🤷‍♂️
     template<Point T>
     Shared<T> As() {
@@ -120,11 +120,11 @@ public:
     }
 
     template<Point T, typename... Args>
-    static Shared<IPoint> Create(Args&&... args) {
+    static Shared<PointInterface> Create(Args&&... args) {
         return std::make_shared<T>(std::forward<Args>(args)...);
     }
 
-    Shared<IPoint> clone() {
+    Shared<PointInterface> clone() {
         return shared_from_this();
     }
 
@@ -137,8 +137,8 @@ public:
 protected:
     int id;
     // Unique pointers will not work with this structure, you'll need to use shared for everything
-    Shared<IPoint> parent;
-    std::vector<Shared<IPoint>> children;
+    Shared<PointInterface> parent;
+    std::vector<Shared<PointInterface>> children;
 
 private:
     static int lastId;
@@ -150,20 +150,20 @@ private:
 
 // Obviously you can separate these out into their own files but for brevity they're here
 
-class NormalPoint final : public IPoint {
+class NormalPoint final : public PointInterface {
 public:
-    NormalPoint() : IPoint() {}
-    explicit NormalPoint(const Shared<IPoint>& parent) : IPoint(parent) {}
+    NormalPoint() : PointInterface() {}
+    explicit NormalPoint(const Shared<PointInterface>& parent) : PointInterface(parent) {}
 };
 
-class ReflectPoint final : public IPoint {
+class ReflectPoint final : public PointInterface {
 public:
-    ReflectPoint() : IPoint() {}
-    explicit ReflectPoint(const Shared<IPoint>& parent) : IPoint(parent) {}
+    ReflectPoint() : PointInterface() {}
+    explicit ReflectPoint(const Shared<PointInterface>& parent) : PointInterface(parent) {}
 };
 
-class DuplicatePoint final : public IPoint {
+class DuplicatePoint final : public PointInterface {
 public:
-    DuplicatePoint() : IPoint() {}
-    explicit DuplicatePoint(const Shared<IPoint>& parent) : IPoint(parent) {}
+    DuplicatePoint() : PointInterface() {}
+    explicit DuplicatePoint(const Shared<PointInterface>& parent) : PointInterface(parent) {}
 };

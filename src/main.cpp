@@ -12,7 +12,7 @@ int main() {
     std::cout << "Begin Program" << '\n'; /*std::endl;*/
 
     // Create a parent point
-    const auto parent = IPoint::Create<NormalPoint>();
+    const auto parent = PointInterface::Create<NormalPoint>();
     // add a couple of points to the parent
     const auto child1 = parent->addChild<NormalPoint>();
     const auto child2 = parent->addChild<NormalPoint>();
@@ -21,7 +21,7 @@ int main() {
     std::cout << parent->toString() << '\n';
 
     // Cloning
-    const Shared<IPoint> parentClone = parent->clone();
+    const Shared<PointInterface> parentClone = parent->clone();
     std::cout << parentClone->toString() << '\n';
 
     // Cloning with specific type
