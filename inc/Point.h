@@ -25,12 +25,6 @@ public:
         children.clear();
     }
 
-    // You don't need this, "shared_from_this" is already accessible as a member function if you
-    // inherit from enable_shared_from_this publicly
-    // Shared<PointInterface> sharedFromThis() {
-    //     return shared_from_this();
-    // }
-
     // Throw a warning if you call this without storing the return value
     [[nodiscard]] int getId() const {
         return id;
