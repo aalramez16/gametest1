@@ -3,10 +3,10 @@
 #include <vector>
 #include <memory>
 
-class Point : std::enable_shared_from_this<Point> {
+class Point {
 protected:
 	int id;
-	std::shared_ptr<Point> parent;
+	std::unique_ptr<Point> parent;
 	std::vector<std::unique_ptr<Point>> children;
 
 public:
@@ -15,29 +15,23 @@ public:
 
 	Point();  // Constructor
 	virtual ~Point(); // Destructor
-	Point(const Point& other); // Copy constructor
-	Point& operator=(const Point& other); // Copy assignment operator
+
+	Point(const Point&) = delete;
+	Point& operator=(const Point&) = delete;
+
 	Point(Point&&) noexcept; // Move constructor
 	Point& operator=(Point&&) noexcept;   // Move assignment operator
-
-	// Virtual clone method for polymorphic behavior
-	virtual std::unique_ptr<Point> clone() const;
-
-	// Exposes shared_from_this
-	std::shared_ptr<Point> sharedFromThis() {
-        return shared_from_this();
-    }
 
 	// Gets the ID for the point
 	int getId() const;
 
 	/**
 	 * Sets the parent for a point
-	 * @param parent a shared pointer to the parent node 
+	 * @param parent a unique pointer to the parent node 
 	 */
-	void setParent(const std::shared_ptr<Point>& parent);
+	void setParent(const std::unique_ptr<Point>& parent);
 
-	std::shared_ptr<Point> getParent() const;
+	const std::unique_ptr<Point>& getParent() const;
 
 	/**
 	 * Adds a child point to the point.
@@ -57,7 +51,7 @@ public:
 	 */
 	const std::vector<std::unique_ptr<Point>>& getChildren() const;
 
-	static void establishParentChildRelationship(std::shared_ptr<Point> parent, std::unique_ptr<Point>& child);
+	static void establishParentChildRelationship(std::unique_ptr<Point> parent, std::unique_ptr<Point>& child);
 
 	std::string toString() const;
 };

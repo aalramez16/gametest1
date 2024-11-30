@@ -2,7 +2,7 @@
 
 void TransformingPoint::createSibling() {
     this->sibling = std::make_unique<Point>();
-    establishParentChildRelationship(this->parent, this->sibling);
+    establishParentChildRelationship(std::move(this->parent), this->sibling);
 }
 
 TransformingPoint::TransformingPoint() : Point() {
@@ -18,10 +18,10 @@ void TransformingPoint::useSibling(const std::function<void(Point &)> &callback)
 }
 
 void TransformingPoint::addChild(const std::unique_ptr<Point>& child) {
-    // Copy of the child by creating a new Point
-    auto childCopy = std::make_unique<Point>(*child);
+    auto newChild = std::make_unique<Point>();
 
     Point::addChild(std::move(child));
 
-    sibling->addChild(std::move(childCopy));
+    sibling->addChild(newChild);
 }
+
