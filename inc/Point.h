@@ -1,57 +1,169 @@
 #pragma once
-#include <iostream>
+
+#include "Types.h"
+
 #include <vector>
 #include <memory>
+#include <sstream>
 
-class Point {
-protected:
-	int id;
-	std::unique_ptr<Point> parent;
-	std::vector<std::unique_ptr<Point>> children;
+// If you want to do inheritance, this is the way I'd recommend doing it:
 
+// forward declare
+class IPoint;
+
+template<typename T>
+concept Point = requires(T t) { std::is_base_of_v<IPoint, T>; };
+
+// We want to define a contract that a Point instance should follow
+// without associating the interface with a specific type of point.
+// i.e. -> decouple
+class IPoint : public std::enable_shared_from_this<IPoint> {
 public:
-	/** Used as a counter for point ID incrementing */
-	static int latestPointId;
+    IPoint() : id(lastId++) {}
+    explicit IPoint(const Shared<IPoint>& parent) : id(lastId++), parent(parent) {}
+    virtual ~IPoint() {
+        children.clear();
+    }
 
-	Point();  // Constructor
-	virtual ~Point(); // Destructor
+    // You don't need this, "shared_from_this" is already accessible as a member function if you
+    // inherit from enable_shared_from_this publicly
+    // Shared<IPoint> sharedFromThis() {
+    //     return shared_from_this();
+    // }
 
-	Point(const Point&) = delete;
-	Point& operator=(const Point&) = delete;
+    // Throw a warning if you call this without storing the return value
+    [[nodiscard]] int getId() const {
+        return id;
+    }
 
-	Point(Point&&) noexcept; // Move constructor
-	Point& operator=(Point&&) noexcept;   // Move assignment operator
+    void setParent(const Shared<IPoint>& parent) {
+        this->parent = parent;
+    }
 
-	// Gets the ID for the point
-	int getId() const;
+    // Same thing, don't allow throwing away the return value
+    [[nodiscard]] Shared<IPoint> getParent() const {
+        return parent;
+    }
 
-	/**
-	 * Sets the parent for a point
-	 * @param parent a unique pointer to the parent node 
-	 */
-	void setParent(const std::unique_ptr<Point>& parent);
+    /**
+     * Adds a child point to the point.
+     * @param child a std::unique_ptr pointer to the child node
+     */
+    void addChild(const Shared<IPoint>& child) {
+        children.push_back(child);
+    }
 
-	const std::unique_ptr<Point>& getParent() const;
+    /**
+     * Removes a child from the point, if it exists.
+     * Deletes the child and all of its children.
+     * @param child a std::unique_ptr pointer to the child node
+     */
+    void removeChild(const Shared<IPoint>& child) {
+        // You can simplify this a lot if you just use the STL erase function.
+        // It'll automatically compare the pointer addresses
+        std::erase(children, child);
+    }
 
-	/**
-	 * Adds a child point to the point.
-	 * @param child a std::unique_ptr pointer to the child node 
-	 */
-	void addChild(const std::unique_ptr<Point>& child);
+    /**
+     * Returns a vector of std::unique_ptr pointers to all children of this point.
+     */
+    [[nodiscard]] const std::vector<Shared<IPoint>>& getChildren() {  // don't need second const
+        // const is fine here unless you need to modify this vector, then you'd just return a
+        // reference
+        return children;
+    }
 
-	/**
-	 * Removes a child from the point, if it exists.
-	 * Deletes the child and all of its children.
-	 * @param child a std::unique_ptr pointer to the child node 
-	 */
-	void removeChild(std::unique_ptr<Point>& child);
+    std::string toString() const {
+        std::ostringstream oss;
+        oss << "ID: " << id << std::endl;
 
-	/**
-	 * Returns a vector of std::unique_ptr pointers to all children of this point.
-	 */
-	const std::vector<std::unique_ptr<Point>>& getChildren() const;
+        // Check if the parent exists
+        if (parent) {
+            oss << "Parent ID: " << parent->getId() << std::endl;
+        } else {
+            oss << "Parent ID: None" << std::endl;
+        }
 
-	static void establishParentChildRelationship(std::unique_ptr<Point> parent, std::unique_ptr<Point>& child);
+        // List children IDs
+        if (!children.empty()) {
+            oss << "Children IDs: [";
+            for (const auto& child : children) {
+                oss << child->getId() << ", ";
+            }
+            // Safely remove the trailing comma and space
+            oss.seekp(-2, std::ios_base::end);
+            oss << "]";
+        } else {
+            oss << "Children IDs: []";
+        }
 
-	std::string toString() const;
+        return oss.str();
+    }
+
+    // These are just some different ideas for modifying this point instance
+
+    // ex:
+    // auto point = std::make_unique<IPoint>();
+    // auto child = point->addChild<DuplicatePoint>(10);
+    template<Point T, typename... Args>
+    Shared<T> addChild(Args&&... args) {
+        auto child = std::make_shared<T>(shared_from_this(), std::forward<Args>(args)...);
+        children.push_back(child);
+        return child;
+    }
+
+    // Provide an easy method of converting to a subclass of IPoint
+    // Sorry not sorry for pascal case 🤷‍♂️
+    template<Point T>
+    Shared<T> As() {
+        return std::dynamic_pointer_cast<T>(shared_from_this());
+    }
+
+    template<Point T, typename... Args>
+    static Shared<IPoint> Create(Args&&... args) {
+        return std::make_shared<T>(std::forward<Args>(args)...);
+    }
+
+    Shared<IPoint> clone() {
+        return shared_from_this();
+    }
+
+    template<Point T>
+    Shared<T> cloneAs() {
+        const auto ptr = clone();
+        return ptr->As<T>();
+    }
+
+protected:
+    int id;
+    // Unique pointers will not work with this structure, you'll need to use shared for everything
+    Shared<IPoint> parent;
+    std::vector<Shared<IPoint>> children;
+
+private:
+    static int lastId;
+};
+
+// ============================================================================================== //
+//                              ACTUAL POINT TYPE IMPLEMENTATIONS                                 //
+// ============================================================================================== //
+
+// Obviously you can separate these out into their own files but for brevity they're here
+
+class NormalPoint final : public IPoint {
+public:
+    NormalPoint() : IPoint() {}
+    explicit NormalPoint(const Shared<IPoint>& parent) : IPoint(parent) {}
+};
+
+class ReflectPoint final : public IPoint {
+public:
+    ReflectPoint() : IPoint() {}
+    explicit ReflectPoint(const Shared<IPoint>& parent) : IPoint(parent) {}
+};
+
+class DuplicatePoint final : public IPoint {
+public:
+    DuplicatePoint() : IPoint() {}
+    explicit DuplicatePoint(const Shared<IPoint>& parent) : IPoint(parent) {}
 };
