@@ -1,3 +1,3 @@
-#include "Point.h"
+#include "PointInterface.h"
 
 int PointInterface::lastId = 0;

@@ -6,13 +6,11 @@
 #include <memory>
 #include <sstream>
 
-// If you want to do inheritance, this is the way I'd recommend doing it:
-
-// forward declare
+// Forward Declare for concept templating
 class PointInterface;
 
 template<typename T>
-concept Point = requires(T t) { std::is_base_of_v<PointInterface, T>; };
+concept PointLikeObject = requires(T t) { std::is_base_of_v<PointInterface, T>; };
 
 // We want to define a contract that a Point instance should follow
 // without associating the interface with a specific type of point.
@@ -82,9 +80,9 @@ public:
 
         // Check if the parent exists
         if (parent) {
-            oss << "Parent ID: " << parent->getId() << std::endl;
+            oss << "Parent ID: " << parent->getId() << "\n";
         } else {
-            oss << "Parent ID: None" << std::endl;
+            oss << "Parent ID: None\n";
         }
 
         // List children IDs
@@ -99,7 +97,7 @@ public:
         } else {
             oss << "Children IDs: []";
         }
-
+        oss << std::endl;
         return oss.str();
     }
 
@@ -108,7 +106,7 @@ public:
     // ex:
     // auto point = std::make_unique<PointInterface>();
     // auto child = point->addChild<DuplicatePoint>(10);
-    template<Point T, typename... Args>
+    template<PointLikeObject T, typename... Args>
     Shared<T> addChild(Args&&... args) {
         auto child = std::make_shared<T>(shared_from_this(), std::forward<Args>(args)...);
         children.push_back(child);
@@ -116,14 +114,13 @@ public:
     }
 
     // Provide an easy method of converting to a subclass of PointInterface
-    // Sorry not sorry for pascal case 🤷‍♂️
-    template<Point T>
-    Shared<T> As() {
+    template<PointLikeObject T>
+    Shared<T> as() {
         return std::dynamic_pointer_cast<T>(shared_from_this());
     }
 
-    template<Point T, typename... Args>
-    static Shared<PointInterface> Create(Args&&... args) {
+    template<PointLikeObject T, typename... Args>
+    static Shared<T> Create(Args&&... args) {
         return std::make_shared<T>(std::forward<Args>(args)...);
     }
 
@@ -131,10 +128,10 @@ public:
         return shared_from_this();
     }
 
-    template<Point T>
+    template<PointLikeObject T>
     Shared<T> cloneAs() {
         const auto ptr = clone();
-        return ptr->As<T>();
+        return ptr->as<T>();
     }
 
 };

@@ -3,20 +3,21 @@
 #include "Types.h"
 #include "PointInterface.h"
 
-class PointNode final : public PointInterface {
+class Point final : public PointInterface {
 public:
-    PointNode() : PointInterface() {}
-    explicit PointNode(const Shared<PointInterface>& parent) : PointInterface(parent) {}
-};
+    const str& type = "Point";
 
-class ReflectingPointNode final : public PointInterface {
-public:
-    ReflectingPointNode() : PointInterface() {}
-    explicit ReflectingPointNode(const Shared<PointInterface>& parent) : PointInterface(parent) {}
-};
+    Point() : PointInterface() {}
+    explicit Point(const Shared<PointInterface>& parent) : PointInterface(parent) {}
 
-class DuplicatingPointNode final : public PointInterface {
-public:
-    DuplicatingPointNode() : PointInterface() {}
-    explicit DuplicatingPointNode(const Shared<PointInterface>& parent) : PointInterface(parent) {}
+    Shared<Point> clone() {
+        return std::static_pointer_cast<Point>(shared_from_this());
+    }
+
+    const str toString() {
+        std::ostringstream oss;
+        oss << "Type: " << type << "\n";
+        oss << this->PointInterface::toString();
+        return oss.str();
+    }
 };

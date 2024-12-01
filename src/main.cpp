@@ -1,32 +1,31 @@
-// maptest1.cpp : This file contains the 'main' function. Program execution begins and ends there.
-// ^ it's called main.cpp, this is implied 😆
-
 #include "Point.h"
+#include "DuplicatingPoint.h"
 
 #include <iostream>
 #include <memory>
 
 int main() {
-    // Don't use `std::endl` more than once per scope
-    // It does more than just add a newline and is notoriously inefficient.
-    std::cout << "Begin Program" << '\n'; /*std::endl;*/
+    std::cout << "Begin Program" << "\n\n";
 
     // Create a parent point
-    const auto parent = PointInterface::Create<NormalPoint>();
+    const auto parent = PointInterface::Create<Point>();
+
     // add a couple of points to the parent
-    const auto child1 = parent->addChild<NormalPoint>();
-    const auto child2 = parent->addChild<NormalPoint>();
-    const auto child3 = parent->addChild<NormalPoint>();
+    const auto child1 = parent->addChild<Point>();
+    const auto child2 = parent->addChild<DuplicatingPoint>();
+    const auto child3 = parent->addChild<Point>();
 
     std::cout << parent->toString() << '\n';
 
     // Cloning
-    const Shared<PointInterface> parentClone = parent->clone();
+    const Shared<Point> parentClone = parent->clone();
     std::cout << parentClone->toString() << '\n';
 
     // Cloning with specific type
-    const Shared<NormalPoint> parentCloneAs = parent->cloneAs<NormalPoint>();
+    const Shared<Point> parentCloneAs = parent->cloneAs<Point>();
     std::cout << parentCloneAs->toString() << '\n';
+
+    std::cout << child2->toString() << '\n';
 
     return 0;
 }
