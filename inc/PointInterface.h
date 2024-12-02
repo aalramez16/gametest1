@@ -6,8 +6,11 @@
 #include <memory>
 #include <sstream>
 
+
 // Forward Declare for concept templating
 class PointInterface;
+
+using SharedPoint = Shared<PointInterface>;
 
 template<typename T>
 concept PointLikeObject = requires(T t) { std::is_base_of_v<PointInterface, T>; };
@@ -18,8 +21,8 @@ concept PointLikeObject = requires(T t) { std::is_base_of_v<PointInterface, T>; 
 class PointInterface : public std::enable_shared_from_this<PointInterface> {
 private:
     static int lastId;
-
 protected:
+    str type = "Base";
     int id;
     // Unique pointers will not work with this structure, you'll need to use shared for everything
     Shared<PointInterface> parent;
@@ -50,7 +53,7 @@ public:
      * Adds a child point to the point.
      * @param child a std::unique_ptr pointer to the child node
      */
-    void addChild(const Shared<PointInterface>& child) {
+    virtual void addChild(const SharedPoint& child) {
         children.push_back(child);
     }
 
@@ -76,7 +79,9 @@ public:
 
     std::string toString() const {
         std::ostringstream oss;
-        oss << "ID: " << id << std::endl;
+        oss << "Type: " << type << "\n";
+
+        oss << "ID: " << id << "\n";
 
         // Check if the parent exists
         if (parent) {
@@ -120,7 +125,7 @@ public:
     }
 
     template<PointLikeObject T, typename... Args>
-    static Shared<T> Create(Args&&... args) {
+    static Shared<T> make(Args&&... args) {
         return std::make_shared<T>(std::forward<Args>(args)...);
     }
 
@@ -128,10 +133,9 @@ public:
         return shared_from_this();
     }
 
-    template<PointLikeObject T>
-    Shared<T> cloneAs() {
+    template<PointLikeObject T, typename... Args>
+    Shared<T> cloneAs(Args&&... args) {
         const auto ptr = clone();
-        return ptr->as<T>();
+        return std::make_shared<T>(ptr, std::forward<Args>(args)...);
     }
-
 };

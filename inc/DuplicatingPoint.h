@@ -5,11 +5,28 @@
 #include "PointInterface.h"
 
 class DuplicatingPoint final : public PointInterface {
+private:
+    int numDuplications;
+    Shared<DuplicatingPoint> duplicate;
 public:
-    const str& type = "Duplicating Point";
+    DuplicatingPoint(int numDuplications) : PointInterface(), numDuplications(numDuplications) {
+        this->type="Duplicating Point";
+        if (numDuplications > 0) {
+            this->addDuplicate(numDuplications);
+        }
+    }
+    explicit DuplicatingPoint(const Shared<PointInterface>& parent, int numDuplications) 
+    : PointInterface(parent), numDuplications(numDuplications) {
+        this->type="Duplicating Point";
 
-    DuplicatingPoint() : PointInterface() {}
-    explicit DuplicatingPoint(const Shared<PointInterface>& parent) : PointInterface(parent) {}
+        if (numDuplications > 0) {
+            this->addDuplicate(numDuplications);
+        }
+    }
+
+    void addDuplicate(int numDuplications) {
+        this->duplicate = this->cloneAs<DuplicatingPoint>(numDuplications - 1);
+    }
 
     Shared<DuplicatingPoint> clone() {
         return std::static_pointer_cast<DuplicatingPoint>(shared_from_this());
@@ -17,7 +34,6 @@ public:
 
     const str toString() {
         std::ostringstream oss;
-        oss << "Type: " << type << "\n";
         oss << this->PointInterface::toString();
         return oss.str();
     }
