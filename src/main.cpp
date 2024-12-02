@@ -11,7 +11,7 @@ using pint = PointInterface;
 int main() {
     std::cout << "Begin Program" << "\n\n";
     
-    auto psys = std::make_unique<PointSystem>(pint::make<ReflectingPoint>());
+    auto psys = std::make_unique<PointSystem>(pint::make<DuplicatingPoint>(1));
 
     auto child = psys->registerPoint(pint::make<Point>());
 
