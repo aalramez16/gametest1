@@ -10,10 +10,10 @@
 // Forward Declare for concept templating
 class PointInterface;
 
-using SharedPoint = Shared<PointInterface>;
-
 template<typename T>
 concept PointLikeObject = requires(T t) { std::is_base_of_v<PointInterface, T>; };
+
+using SharedPoint = Shared<PointInterface>;
 
 // We want to define a contract that a Point instance should follow
 // without associating the interface with a specific type of point.
@@ -36,7 +36,7 @@ public:
     }
 
     // Throw a warning if you call this without storing the return value
-    [[nodiscard]] int getId() const {
+    virtual int getId() const {
         return id;
     }
 
@@ -71,7 +71,7 @@ public:
     /**
      * Returns a vector of std::unique_ptr pointers to all children of this point.
      */
-    [[nodiscard]] const std::vector<Shared<PointInterface>>& getChildren() {  // don't need second const
+    virtual const std::vector<Shared<PointInterface>>& getChildren() {  // don't need second const
         // const is fine here unless you need to modify this vector, then you'd just return a
         // reference
         return children;
