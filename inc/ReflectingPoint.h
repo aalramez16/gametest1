@@ -26,7 +26,7 @@ public:
         return std::static_pointer_cast<ReflectingPoint>(shared_from_this());
     }
 
-    str toString() override {
+    str toString() {
         std::ostringstream oss;
         oss << this->PointInterface::toString();
         return oss.str();
