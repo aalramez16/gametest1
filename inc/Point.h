@@ -16,7 +16,7 @@ public:
         return std::static_pointer_cast<Point>(shared_from_this());
     }
 
-    const str toString() {
+    str toString() override {
         std::ostringstream oss;
         oss << this->PointInterface::toString();
         return oss.str();

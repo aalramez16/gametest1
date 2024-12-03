@@ -58,10 +58,7 @@ public:
     }
 
     void addChild(const SharedPoint& child) override {
-        this->addRealChild(child);
-        for (auto& duplicate : getDuplicates()) {
-            duplicate->addRealChild(child);
-        }
+        this->reference->addChild(child);
     }
 
     Shared<DuplicatingPoint> getDuplicate() {
@@ -114,10 +111,32 @@ public:
         return std::static_pointer_cast<DuplicatingPoint>(shared_from_this());
     }
 
-    const str toString() {
+    std::string toString() override {
         std::ostringstream oss;
-        oss << "Number of duplications made: " << numDuplications;
-        oss << this->PointInterface::toString();
+        oss << "Type: " << type << "\n";
+
+        oss << "ID: " << id << "\n";
+
+        // Check if the parent exists
+        if (parent) {
+            oss << "Parent ID: " << parent->getId() << "\n";
+        } else {
+            oss << "Parent ID: None\n";
+        }
+
+        // List children IDs
+        if (!getChildren().empty()) {
+            oss << "Children IDs: [";
+            for (const auto& child : getChildren()) {
+                oss << child->getId() << ", ";
+            }
+            // Safely remove the trailing comma and space
+            oss.seekp(-2, std::ios_base::end);
+            oss << "]";
+        } else {
+            oss << "Children IDs: []";
+        }
+        oss << std::endl;
         return oss.str();
     }
 };

@@ -77,7 +77,7 @@ public:
         return children;
     }
 
-    std::string toString() const {
+    virtual std::string toString() {
         std::ostringstream oss;
         oss << "Type: " << type << "\n";
 
