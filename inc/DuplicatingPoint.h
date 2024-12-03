@@ -7,7 +7,7 @@
 class DuplicatingPoint final : public PointInterface {
 private:
     int numDuplications;
-    Shared<Point> reference;
+    SharedPoint reference;
     Shared<DuplicatingPoint> duplicate;
     std::vector<Shared<PointInterface>> combinedChildren;
 public:
@@ -33,7 +33,7 @@ public:
     }
 
     // This will be the constructor called by duplicates
-    DuplicatingPoint(int numDuplications, const Shared<Point>& reference) 
+    DuplicatingPoint(int numDuplications, const SharedPoint& reference) 
     : PointInterface(),
       numDuplications(numDuplications),
       reference(reference)
@@ -42,8 +42,12 @@ public:
         createDuplicate();
     }
 
-    [[nodiscard]] const Shared<Point>& getReference() {
+    [[nodiscard]] const SharedPoint& getReference() {
         return reference;
+    }
+
+    void setReference(const SharedPoint& reference) {
+        this->reference = reference;
     }
 
     void createDuplicate() {
