@@ -117,13 +117,6 @@ public:
 
         oss << "ID: " << id << "\n";
 
-        // Check if the parent exists
-        if (parent) {
-            oss << "Parent ID: " << parent->getId() << "\n";
-        } else {
-            oss << "Parent ID: None\n";
-        }
-
         // List children IDs
         if (!getChildren().empty()) {
             oss << "Children IDs: [";

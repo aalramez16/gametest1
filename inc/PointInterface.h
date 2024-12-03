@@ -24,13 +24,10 @@ private:
 protected:
     str type = "Base";
     int id;
-    // Unique pointers will not work with this structure, you'll need to use shared for everything
-    Shared<PointInterface> parent;
     std::vector<Shared<PointInterface>> children;
 
 public:
     PointInterface() : id(lastId++) {}
-    explicit PointInterface(const Shared<PointInterface>& parent) : id(lastId++), parent(parent) {}
     virtual ~PointInterface() {
         children.clear();
     }
@@ -38,15 +35,6 @@ public:
     // Throw a warning if you call this without storing the return value
     virtual int getId() const {
         return id;
-    }
-
-    void setParent(const Shared<PointInterface>& parent) {
-        this->parent = parent;
-    }
-
-    // Same thing, don't allow throwing away the return value
-    [[nodiscard]] Shared<PointInterface> getParent() const {
-        return parent;
     }
 
     /**
@@ -82,13 +70,6 @@ public:
         oss << "Type: " << type << "\n";
 
         oss << "ID: " << id << "\n";
-
-        // Check if the parent exists
-        if (parent) {
-            oss << "Parent ID: " << parent->getId() << "\n";
-        } else {
-            oss << "Parent ID: None\n";
-        }
 
         // List children IDs
         if (!children.empty()) {

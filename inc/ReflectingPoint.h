@@ -11,9 +11,6 @@ public:
     ReflectingPoint() : PointInterface() {
         this->type="Reflecting Point";
     }
-    explicit ReflectingPoint(const Shared<PointInterface>& parent) : PointInterface(parent) {
-        this->type="Reflecting Point";
-    }
 
     /**
      * Adds the child twice. One will be used as a reflection of the other
