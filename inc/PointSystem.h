@@ -4,6 +4,7 @@
 #include "PointInterface.h"
 
 #include <vector>
+#include <typeinfo>
 
 class PointSystem {
 private:
@@ -34,8 +35,17 @@ public:
      *  @brief Adds a `std::shared_ptr<PointInterface>` to the `pointRegistry`
      *  @param point a `std::shared_ptr` to the `PointInterface`
      */
-    const SharedPoint& registerPoint(const SharedPoint& point) {
+    template <typename T>
+    const Shared<T>& registerPoint(const Shared<T>& point) {
         pointRegistry.push_back(point);
+        return point;
+    }
+
+    template<>
+    const Shared<NewReflectingPoint>& registerPoint(const Shared<NewReflectingPoint>& point) {
+        pointRegistry.push_back(point);
+        pointRegistry.push_back(point->getReference());
+        pointRegistry.push_back(point->getReflection());
         return point;
     }
 

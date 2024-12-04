@@ -1,14 +1,15 @@
 #pragma once
 
 #include "Types.h"
-
 #include <vector>
 #include <memory>
 #include <sstream>
 
+#include <iostream>
 
 // Forward Declare for concept templating
 class PointInterface;
+class NewReflectingPoint;
 
 template<typename T>
 concept PointLikeObject = requires(T t) { std::is_base_of_v<PointInterface, T>; };
@@ -45,6 +46,8 @@ public:
         children.push_back(child);
     }
 
+    void addChild(const Shared<NewReflectingPoint>& child);
+
     /**
      * Removes a child from the point, if it exists.
      * Deletes the child and all of its children.
@@ -63,6 +66,14 @@ public:
         // const is fine here unless you need to modify this vector, then you'd just return a
         // reference
         return children;
+    }
+
+    virtual void setChildren(const std::vector<Shared<PointInterface>>& children) {
+        this->children = children;
+    }
+
+    void setType(const str& type) {
+        this->type = type;
     }
 
     virtual std::string toString() {
@@ -98,6 +109,7 @@ public:
         children.push_back(child);
         return child;
     }
+
 
     // Provide an easy method of converting to a subclass of PointInterface
     template<PointLikeObject T>
