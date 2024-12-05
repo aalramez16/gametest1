@@ -8,7 +8,7 @@ private:
     SharedPoint reference;
 public:
     Reflection() = delete;
-    Reflection(const SharedPoint& reference) : PointInterface(), reference(reference) {
+    Reflection(const SharedPoint& reference, int maxChildren=3) : PointInterface(maxChildren), reference(reference) {
         this->type="Reflection";
     }
 
@@ -20,8 +20,8 @@ public:
         return std::static_pointer_cast<Reflection>(shared_from_this());
     }
 
-    void addChild(const SharedPoint& child) override {
-        this->reference->addChild(child);
+    bool addChild(const SharedPoint& child) override {
+        return this->reference->addChild(child);
     }
 
     std::string toString() override {

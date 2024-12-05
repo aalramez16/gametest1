@@ -6,18 +6,20 @@
 
 int PointInterface::lastId = 0;
 
-ReflectingPoint::ReflectingPoint() : PointInterface(), reference(PointInterface::make<Point>()), reflection(PointInterface::make<Reflection>(reference)) {
+ReflectingPoint::ReflectingPoint(int maxChildren) : PointInterface(maxChildren), reference(PointInterface::make<Point>()), reflection(PointInterface::make<Reflection>(reference)) {
     this->type=" Reflecting Point";
     reference->setType("Reflecting Point Reference");
 }
 
-void PointInterface::addChild(const Shared<ReflectingPoint>& child) {
-    children.push_back(child);
-    children.push_back(child->getReflection());
+bool PointInterface::addChild(const Shared<ReflectingPoint>& child) {
+    return this->appendToChildren(child, child->getReflection());
 }
 
-void DuplicatingPoint::addChild(const Shared<ReflectingPoint>& child) {
-    this->reference->addChild(child);
+bool DuplicatingPoint::addChild(const Shared<ReflectingPoint>& child) {
+    if (children.size() + 2 <= maxChildren) {
+        return this->reference->addChild(child);
+    }
+    return false;
 }
 
 const Shared<PointInterface> ReflectingPoint::getReflection() {

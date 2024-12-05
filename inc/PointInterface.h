@@ -26,9 +26,23 @@ protected:
     str type = "Base";
     int id;
     std::vector<Shared<PointInterface>> children;
+    int maxChildren;
+
+    template <typename... Args>
+    bool appendToChildren(Args&& ...args) { // Pass children of type Shared<PointInterface> (or a derived class)
+        static_assert((std::is_convertible_v<Args, Shared<PointInterface>> && ...),
+                  "All arguments must be of type Shared<PointInterface> or convertible to it");
+        int numToAdd = sizeof...(args); // Get number of args passed
+        if (children.size() + numToAdd <= maxChildren) { // if number doesn't exceed max after addition
+            children.reserve(numToAdd);
+            (children.emplace_back(std::forward<Args>(args)), ...); // Add all children
+            return true; // task passed
+        }
+        return false; // task failed
+    }
 
 public:
-    PointInterface() : id(lastId++) {}
+    PointInterface(int maxChildren=3) : id(lastId++), maxChildren(maxChildren) {}
     virtual ~PointInterface() {
         children.clear();
     }
@@ -42,11 +56,11 @@ public:
      * Adds a child point to the point.
      * @param child a std::unique_ptr pointer to the child node
      */
-    virtual void addChild(const SharedPoint& child) {
-        children.push_back(child);
+    virtual bool addChild(const SharedPoint& child) {
+        return this->appendToChildren(child);
     }
 
-    void addChild(const Shared<ReflectingPoint>& child);
+    bool addChild(const Shared<ReflectingPoint>& child);
 
     /**
      * Removes a child from the point, if it exists.

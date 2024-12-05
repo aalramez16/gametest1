@@ -10,14 +10,14 @@ private:
     SharedPoint reference;
     const Shared<Reflection> reflection;
 public:
-    ReflectingPoint();
+    ReflectingPoint(int maxChildren=3);
 
     Shared<ReflectingPoint> clone() {
         return std::static_pointer_cast<ReflectingPoint>(shared_from_this());
     }
 
-    void addChild(const SharedPoint& child) override {
-        this->reference->addChild(child);
+    bool addChild(const SharedPoint& child) override {
+        return this->reference->addChild(child);
     }
 
     const std::vector<Shared<PointInterface>>& getChildren() override {

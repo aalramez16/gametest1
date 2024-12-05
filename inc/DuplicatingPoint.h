@@ -11,21 +11,9 @@ private:
     Shared<DuplicatingPoint> duplicate;
     std::vector<Shared<PointInterface>> combinedChildren;
 public:
-
     // Calling this constructor assumes you are the top of the chain
-    DuplicatingPoint()
-    : PointInterface(),
-      numDuplications(1),
-      reference(PointInterface::make<PointInterface>())
-    {
-        this->type="Duplicating Point";
-        reference->setType("Duplicating Point Reference");
-        createDuplicate();
-    }
-
-    // Calling this constructor assumes you are the top of the chain
-    DuplicatingPoint(int numDuplications)
-    : PointInterface(),
+    DuplicatingPoint(int numDuplications, int maxChildren=3)
+    : PointInterface(maxChildren),
       numDuplications(numDuplications),
       reference(PointInterface::make<PointInterface>())
     {
@@ -35,8 +23,8 @@ public:
     }
 
     // This will be the constructor called by duplicates
-    DuplicatingPoint(int numDuplications, const SharedPoint& reference) 
-    : PointInterface(),
+    DuplicatingPoint(int numDuplications, const SharedPoint& reference, int maxChildren=3) 
+    : PointInterface(maxChildren),
       numDuplications(numDuplications),
       reference(reference)
     {
@@ -64,11 +52,11 @@ public:
         PointInterface::addChild(child);
     }
 
-    void addChild(const SharedPoint& child) override {
-        this->reference->addChild(child);
+    bool addChild(const SharedPoint& child) override {
+        return this->reference->addChild(child);
     }
 
-    void addChild(const Shared<ReflectingPoint>& child);
+    bool addChild(const Shared<ReflectingPoint>& child);
 
     Shared<DuplicatingPoint> getDuplicate() {
         return this->duplicate;

@@ -5,7 +5,7 @@
 
 class Point final : public PointInterface {
 public:
-    Point() : PointInterface() {
+    Point(int maxChildren=3) : PointInterface(maxChildren) {
         this->type="Point";
     }
 
