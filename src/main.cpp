@@ -20,11 +20,11 @@ int main() {
     // Add the reflecting point to the root, a duplicatingPoint
     psys->getRoot()->addChild(reflectingPoint);
 
-    auto reflectingPointChild = psys->registerPoint(pint::make<DuplicatingPoint>(4));
+    auto reflectingPointChild = psys->registerPoint<DuplicatingPoint>(pint::make<DuplicatingPoint>(4));
     // reflectingPointChild->setType("Child of Reflecting Point");
     reflectingPoint->addChild(reflectingPointChild);
 
-    auto meow = psys->registerPoint(pint::make<ReflectingPoint>());
+    auto meow = psys->registerPoint<ReflectingPoint>(pint::make<ReflectingPoint>());
 
     reflectingPointChild->addChild(meow);
 

@@ -16,7 +16,7 @@ public:
     DuplicatingPoint()
     : PointInterface(),
       numDuplications(1),
-      reference(PointInterface::make<Point>())
+      reference(PointInterface::make<PointInterface>())
     {
         this->type="Duplicating Point";
         reference->setType("Duplicating Point Reference");
@@ -27,7 +27,7 @@ public:
     DuplicatingPoint(int numDuplications)
     : PointInterface(),
       numDuplications(numDuplications),
-      reference(PointInterface::make<Point>())
+      reference(PointInterface::make<PointInterface>())
     {
         this->type="Duplicating Point";
         reference->setType("Duplicating Point Reference");
@@ -67,6 +67,8 @@ public:
     void addChild(const SharedPoint& child) override {
         this->reference->addChild(child);
     }
+
+    void addChild(const Shared<ReflectingPoint>& child);
 
     Shared<DuplicatingPoint> getDuplicate() {
         return this->duplicate;
