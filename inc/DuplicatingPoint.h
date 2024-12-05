@@ -19,6 +19,7 @@ public:
       reference(PointInterface::make<Point>())
     {
         this->type="Duplicating Point";
+        reference->setType("Duplicating Point Reference");
         createDuplicate();
     }
 
@@ -29,6 +30,7 @@ public:
       reference(PointInterface::make<Point>())
     {
         this->type="Duplicating Point";
+        reference->setType("Duplicating Point Reference");
         createDuplicate();
     }
 
@@ -39,6 +41,7 @@ public:
       reference(reference)
     {
         this->type="Duplicating Point";
+        reference->setType("Duplicating Point Reference");
         createDuplicate();
     }
 

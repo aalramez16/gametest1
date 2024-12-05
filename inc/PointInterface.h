@@ -9,7 +9,7 @@
 
 // Forward Declare for concept templating
 class PointInterface;
-class NewReflectingPoint;
+class ReflectingPoint;
 
 template<typename T>
 concept PointLikeObject = requires(T t) { std::is_base_of_v<PointInterface, T>; };
@@ -46,7 +46,7 @@ public:
         children.push_back(child);
     }
 
-    void addChild(const Shared<NewReflectingPoint>& child);
+    void addChild(const Shared<ReflectingPoint>& child);
 
     /**
      * Removes a child from the point, if it exists.

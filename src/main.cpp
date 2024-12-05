@@ -1,6 +1,6 @@
 #include "Point.h"
 #include "DuplicatingPoint.h"
-#include "NewReflectingPoint.h"
+#include "ReflectingPoint.h"
 #include "PointSystem.h"
 
 #include <memory>
@@ -15,14 +15,18 @@ int main() {
     psys->getRoot()->setType("Root");
 
     // Create and register an orphaned reflecting point
-    auto reflectingPoint = psys->registerPoint<NewReflectingPoint>(pint::make<NewReflectingPoint>());
+    auto reflectingPoint = psys->registerPoint<ReflectingPoint>(pint::make<ReflectingPoint>());
 
     // Add the reflecting point to the root, a duplicatingPoint
     psys->getRoot()->addChild(reflectingPoint);
 
-    auto reflectingPointChild = psys->registerPoint(pint::make<Point>());
-    reflectingPointChild->setType("Child of Reflecting Point");
+    auto reflectingPointChild = psys->registerPoint(pint::make<DuplicatingPoint>(4));
+    // reflectingPointChild->setType("Child of Reflecting Point");
     reflectingPoint->addChild(reflectingPointChild);
+
+    auto meow = psys->registerPoint(pint::make<ReflectingPoint>());
+
+    reflectingPointChild->addChild(meow);
 
     // List the IDs registered in the point system
     std::cout << psys->toString() << '\n';

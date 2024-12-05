@@ -1,20 +1,20 @@
 #include "PointInterface.h"
-#include "NewReflectingPoint.h"
+#include "ReflectingPoint.h"
 #include "Reflection.h"
 #include "Point.h"
 
 int PointInterface::lastId = 0;
 
-NewReflectingPoint::NewReflectingPoint() : PointInterface(),reference(PointInterface::make<Point>()), reflection(PointInterface::make<Reflection>(reference)) {
-    this->type="New Reflecting Point";
+ReflectingPoint::ReflectingPoint() : PointInterface(),reference(PointInterface::make<Point>()), reflection(PointInterface::make<Reflection>(reference)) {
+    this->type=" Reflecting Point";
     reference->setType("Reflecting Point Reference");
 }
 
-void PointInterface::addChild(const Shared<NewReflectingPoint>& child) {
+void PointInterface::addChild(const Shared<ReflectingPoint>& child) {
     children.push_back(child);
     children.push_back(child->getReflection());
 }
 
-const Shared<PointInterface> NewReflectingPoint::getReflection() {
+const Shared<PointInterface> ReflectingPoint::getReflection() {
     return reflection;
 }

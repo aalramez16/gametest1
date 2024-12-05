@@ -42,10 +42,20 @@ public:
     }
 
     template<>
-    const Shared<NewReflectingPoint>& registerPoint(const Shared<NewReflectingPoint>& point) {
+    const Shared<ReflectingPoint>& registerPoint(const Shared<ReflectingPoint>& point) {
         pointRegistry.push_back(point);
         pointRegistry.push_back(point->getReference());
         pointRegistry.push_back(point->getReflection());
+        return point;
+    }
+
+    template<>
+    const Shared<DuplicatingPoint>& registerPoint(const Shared<DuplicatingPoint>& point) {
+        pointRegistry.push_back(point);
+        pointRegistry.push_back(point->getReference());
+        for (auto& duplicate : point->getDuplicates()) {
+            pointRegistry.push_back(duplicate);
+        }
         return point;
     }
 
