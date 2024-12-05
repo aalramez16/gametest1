@@ -2,11 +2,10 @@
 #include "ReflectingPoint.h"
 #include "Reflection.h"
 #include "DuplicatingPoint.h"
-#include "Point.h"
 
 int PointInterface::lastId = 0;
 
-ReflectingPoint::ReflectingPoint(int maxChildren) : PointInterface(maxChildren), reference(PointInterface::make<Point>()), reflection(PointInterface::make<Reflection>(reference)) {
+ReflectingPoint::ReflectingPoint(int maxChildren) : PointInterface(maxChildren), reference(PointInterface::make<PointInterface>()), reflection(PointInterface::make<Reflection>(reference)) {
     this->type=" Reflecting Point";
     reference->setType("Reflecting Point Reference");
 }

@@ -1,4 +1,3 @@
-#include "Point.h"
 #include "DuplicatingPoint.h"
 #include "ReflectingPoint.h"
 #include "PointSystem.h"
@@ -11,7 +10,7 @@ int main() {
     std::cout << "Begin Program" << "\n\n";
     
     // Initialize the point system
-    auto psys = std::make_unique<PointSystem>(pint::make<Point>());
+    auto psys = std::make_unique<PointSystem>(pint::make<PointInterface>());
     psys->getRoot()->setType("Root");
 
     // Create and register an orphaned reflecting point
